@@ -1,0 +1,39 @@
+{
+  "name": "connect_node_worker_azure",
+  "version": "1.0.0",
+  "description": "Work off DS Connect msgs via an Azure Service Message Bus queue",
+  "main": "index.js",
+  "scripts": {
+    "debug": "node --require dotenv/config --inspect-brk index.js",
+    "start": "node --require dotenv/config index.js",
+    "test": "mocha"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/docusign/connect-node-worker-bee-queue"
+  },
+  "author": "DocuSign, Inc",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/docusign/connect-node-worker-bee-queue/issues"
+  },
+  "homepage": "https://github.com/docusign/connect-node-worker-bee-queue#readme",
+  "engines": {
+    "node": ">=8.10"
+  },
+  "dependencies": {
+    "@google-cloud/pubsub": "^0.28.1",
+    "async-lock": "^1.2.0",
+    "docusign-esign": "^4.3.0",
+    "dotenv": "^7.0.0",
+    "fs-extra": "^7.0.1",
+    "moment": "^2.24.0",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.7",
+    "xml2js": "^0.4.19"
+  },
+  "devDependencies": {}
+}

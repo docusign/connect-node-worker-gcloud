@@ -1,5 +1,6 @@
+gcloud.json
 output/*
-tests/*
+testMessages/*
 .DS_Store
 # Logs
 logs
