@@ -1,173 +1,96 @@
-# Connect Node.js Worker (Bee-Queue)
+# Connect Node Worker for Google Cloud
 
-This app creates an example worker daemon
-for receiving and processing
-DocuSign Connect notification messages
-via a [Bee-Queue](https://bee-queue.com/).
+This is an example worker application for
+Connect webhook notification messages sent
+via the 
+[Google Cloud Pub/Sub](https://cloud.google.com/pubsub/) 
+service.
 
-The Bee-Queue library uses a [Redis](https://redis.io/)
-server to store the queue information.
+This application receives messages from the queue
+via a 
+[Pub/Sub Subscription](https://cloud.google.com/pubsub/docs/subscriber),
+and then processes
+them:
+
+1. If the envelope is complete, the application
+   uses a DocuSign JWT Grant token to retrieve
+   the envelope's combined set of documents,
+   and stores them in the `output` directory.
+
+   The envelope must include an Envelope Custom Field
+   named `Sales order.` The Sales order field is used
+   to name the output file.
+1. Optionally, this worker app can be configured to
+   also change the color of an 
+   [LIFX](https://www.lifx.com/)
+   bulb (or set of bulbs)
+   to the color set in the envelope's 
+   Custom Field `Light color`
 
 ## Architecture
-![architecture](./docs/architecture.png)
+![Connect listener architecture](docs/connect_listener_architecture.png)
 
-The diagram shows DocuSign Connect making an
-HTTPS POST request to the Node.js Listener.
+This figure shows the solution's architecture. 
+This worker application is written in Node.js. 
+But it 
+could be written in a different language.
 
-The listener's port must be available on the public
-internet to enable DocuSign connect to reach it.
-
-The listener stores the notification message on 
-the Bee-Queue. The Bee-Queue software adds
-the message to the Redis server.
-
-Meanwhile, the Connect Node.js worker application
-(this repo)
-is using the Bee-Queue software to receive
-incoming messages from the queue.
-
-The Bee-Queue software creates a TCP channel to the
-Redis software. Since the Bee-Queue software on the
-worker is *initiating* the connection to the Redis 
-server, the worker can be placed behind a 
-firewall/gateway system.
-
-### Variations
-The listener application can be on the same machine as the 
-Redis server, or on a different machine.
-
-The worker machine can be on the public internet.
-It can also be on the same machine as the Redis
-server.
-
-Bee-Queue supports multiple worker clients.
-They will process incoming notifications/jobs
-simultaneously. Each incoming notification will be
-processed by one worker.
-
-### At least once delivery
-The Bee-Queue software, like many reliable 
-FIFO libraries, uses an **At least once delivery**
-algorithm to ensure that every incoming message
-is processed. 
-
-Since there are cases where a message can be 
-processed more than once, your message worker
-should be designed to be **idempotent.** 
-That is, there should be no difference in 
-results if a specific message is processed 
-once or more than once.
-
-### The worker's task
-This worker software implements an idempotent
-process for each incoming notification message:
-
-1. **Filtering.** The notification message is checker
-   to determine if it should be processed or 
-   ignored. 
-   
-   For this example, the app will  filter out (discard)
-   any notifications unless the envelope status is complete
-   and has an "Order number" envelope custom field.
-1. The envelope's documents are fetched from
-   DocuSign as a single **combined** pdf.
-1. The document is written as a file to the output directory.
-
-### Idempotent processing
-If a duplicate notification message is received, 
-then envelope's documents will be fetched a second time
-and then stored (with the prior version over-written).
+Google has SDK libraries for 
+[Pub/Sub clients](https://cloud.google.com/pubsub/docs/reference/libraries)
+for C#, Go, Java, Node.js, PHP, Python, and Ruby. 
 
 ## Installation
 
-The **connect-node-listener-bee-queue** software,
-including the Connect configuration and Redis 
-server should be
-installed first.
+1. Install the example 
+   [Connect listener for Google Cloud](../connect-node-listener-gcloud).
+   At the end of this step, you will have the
+   `Subscription name` and a `Service Account credentials file`.
 
-### The worker application
-This application has been tested with the current version of the
-Node.js v8 LTS (Long Term Support) software. It should also
-work with later versions of Node.js.
+1. Install the latest Long Term Support version of 
+   Node v8.x or v10.x on your system, with the
+   npm package manager.
 
-Please report any issues via this repository's issue page.
+1. Download this repo to a directory.
 
-### Installation steps
+1. In the directory:
 
-#### Operating System
-The following steps are used for a Linux / MacOS
-system. The **run_worker.sh** command has not yet been
-tested on a Windows system.
+   `npm install`
+1. Configure `ds_configuration.js` or set the 
+   environment variables as indicated in that file.
 
-The  [Git Windows](https://gitforwindows.org/) 
-application and its included Windows
-Bash shell may be of help for **run_worker.sh** Or 
-it could be ported to PowerShell.
+1. Set and export the environment variable 
+   `GOOGLE_APPLICATION_CREDENTIALS` to the 
+   name (and directory) of the service account
+   JSON credentials file. DocuSign suggests `gcloud.json`
 
-Instead of the run-worker.sh command for restarting
-the worker, a monitoring system such as 
-[pm2](https://github.com/Unitech/pm2),
-[forever](https://www.npmjs.com/package/forever),
-or similar could be used.
+1. Start the lisener:
 
-#### Steps
-1. Download or clone this repository
-1. Move or **cd** to the downloaded directory
-1. npm install
-1. configure the ds_configuration.js file (see below) or 
-   set the environment variables.
-1. Do not use npm start. Instead, run **run_worker.sh**
+   `npm start`
 
-### Configuration
-The application is configured in the ds_configuration.js file.
+## Testing
+Configure a DocuSign Connect subscription to send notifications to
+the Cloud Function. Create / complete a DocuSign envelope.
 
-See the file for instructions.
+* Check the Connect logs for feedback.
+* Check the console output of this app for log output.
+* Check the `output` directory to see if the envelope's
+  combined documents and CoC were downloaded.
 
-## Operation
-After the worker has been started, the server will run by itself.
+  By default, the documents will only be downloaded if
+  the envelope is complete and includes a 
+  `Sales order` custom field.
 
-It is designed to restart itself if too many network errors are 
-received.
+## Semi-automatic testing
+The repo includes a `runTest.js` file. It conducts an
+end-to-end integration test of enqueuing and dequeuing
+test messages. See the file for more information.
 
-### Testing
+## License and Pull Requests
 
-#### Long term tests
-1. cd connect-node-worker-bee-queue/tests
-1. ./tests.js few    # One test set of five messages is sent per hour 
-1. ./tests.js many   # Five tests are sent and then checked. Then repeat asap.
+### License
+This repository uses the MIT License. See the LICENSE file for more information.
 
-Each test runs for 8 hours.
-
-#### Break test
-Set the `ds_configuration.js` value `enableBreakTest` to `true`
-
-Then send a test message that include `/break` as part of the test value. Eg:
-
-````
-curl -X POST dslistener.example.com/docusign-listener?test=/break
-````
-
-This will cause the worker to raise an exception while processing the 
-test message. 
-
-Since the message has not been completely processed, when the worker
-restarts (which should happen automatically), the worker will again
-attempt to process the test and raise the exception again.
-
-To break the cycle, set the `enableBreakTest` configuration value to `false`
-or use Redis tools to clear the Redis db.
-
-## License
-MIT License. See the LICENSE file.
-
-## Contributing, issues, etc
-
-Contributions are welcomed. Please submit a pull request.
-
-Bug reports: please use the Issues page of this repository.
-
-General questions about the software: please submit your question to 
-StackOverflow and use the 'docusignapi' tag. We monitor the
-tag. StackOverflow is the fastest way to have your questions 
-answered.
+### Pull Requests
+Pull requests are welcomed. Pull requests will only be considered if their content
+uses the MIT License.
 
