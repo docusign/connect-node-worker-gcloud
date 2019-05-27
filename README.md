@@ -50,6 +50,19 @@ for C#, Go, Java, Node.js, PHP, Python, and Ruby.
    Node v8.x or v10.x on your system, with the
    npm package manager.
 
+1. Configure a DocuSign Integration Key for the application.
+   The application uses the OAuth GWT Grant flow.
+
+   If consent has not been granted to the application by
+   the user, then the application provides a url
+   that can be used to grant individual consent.
+
+   **To enable individual consent:** either
+   add the URL `https://www.docusign.com` as a redirect URI
+   for the Integration Key, or add a different URL and
+   update the `oAuthConsentRedirectURI` setting
+   in the ds_configuration.js file.
+
 1. Download this repo to a directory.
 
 1. In the directory:
@@ -63,7 +76,7 @@ for C#, Go, Java, Node.js, PHP, Python, and Ruby.
    name (and directory) of the service account
    JSON credentials file. DocuSign suggests `gcloud.json`
 
-1. Start the lisener:
+1. Start the listener:
 
    `npm start`
 
