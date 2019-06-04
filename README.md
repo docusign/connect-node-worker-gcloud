@@ -42,7 +42,7 @@ for C#, Go, Java, Node.js, PHP, Python, and Ruby.
 ## Installation
 
 1. Install the example 
-   [Connect listener for Google Cloud](../connect-node-listener-gcloud).
+   [Connect listener for Google Cloud](../connect-node-listener-gcloud) on Google Cloud.
    At the end of this step, you will have the
    `Subscription name` and a `Service Account credentials file`.
 
@@ -51,7 +51,7 @@ for C#, Go, Java, Node.js, PHP, Python, and Ruby.
    npm package manager.
 
 1. Configure a DocuSign Integration Key for the application.
-   The application uses the OAuth GWT Grant flow.
+   The application uses the OAuth JWT Grant flow.
 
    If consent has not been granted to the application by
    the user, then the application provides a url
