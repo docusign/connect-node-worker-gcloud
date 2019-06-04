@@ -83,6 +83,7 @@ for C#, Go, Java, Node.js, PHP, Python, and Ruby.
 ## Testing
 Configure a DocuSign Connect subscription to send notifications to
 the Cloud Function. Create / complete a DocuSign envelope.
+The envelope **must include an Envelope Custom Field named "Sales order".**
 
 * Check the Connect logs for feedback.
 * Check the console output of this app for log output.
