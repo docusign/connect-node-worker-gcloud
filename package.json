@@ -25,7 +25,7 @@
     "node": ">=8.10"
   },
   "dependencies": {
-    "@google-cloud/pubsub": "^1.7.2",
+    "@google-cloud/pubsub": "^2.6.0",
     "async-lock": "^1.2.2",
     "docusign-esign": "^4.3.0",
     "dotenv": "^7.0.0",
