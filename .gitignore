@@ -1,4 +1,5 @@
 gcloud.json
+package-lock.json
 output/*
 testMessages/*
 .DS_Store
