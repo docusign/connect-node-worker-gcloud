@@ -110,8 +110,8 @@ Problem: you need to configure this example, either via environment variables (r
               `scope=${consent_scopes}&client_id=${dsConfig.clientId}&` +
               `redirect_uri=${dsConfig.oAuthConsentRedirectURI}`;
         console.log(`\nProblem:   C O N S E N T   R E Q U I R E D
-    Ask the user who will be impersonated to run the following url:
-        ${consent_url}
+    Ask the user who will be impersonated to run the DocuSign OAuth
+    consent URL configured for this application.
     
     It will ask the user to login and to approve access by your application.
     
